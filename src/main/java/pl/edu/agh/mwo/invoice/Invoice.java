@@ -8,6 +8,14 @@ import pl.edu.agh.mwo.invoice.product.Product;
 
 public class Invoice {
 	private Map<Product, Integer> products = new HashMap<Product, Integer>();
+	private int number;
+	private static int nextNumber = 1;
+	
+	public Invoice() {
+		this.number = nextNumber;
+		nextNumber += 1;
+	}
+	
 
 	public void addProduct(Product product) {
 		addProduct(product, 1);
@@ -16,6 +24,9 @@ public class Invoice {
 	public void addProduct(Product product, Integer quantity) {
 		if (product == null || quantity <= 0) {
 			throw new IllegalArgumentException();
+		}
+		if (products.containsKey(product)) {
+			quantity = products.get(product) + quantity;
 		}
 		products.put(product, quantity);
 	}
@@ -40,5 +51,19 @@ public class Invoice {
 			totalGross = totalGross.add(product.getPriceWithTax().multiply(quantity));
 		}
 		return totalGross;
+	}
+	
+	public int getInvoiceNumber() {
+		return number;
+	}
+	
+	public String printedVersion() {
+		String printed = String.valueOf(number);
+		for (Product product : products.keySet()) {
+			printed += "\n" + product.getName();
+			printed += ", " + product.getClass().getName();
+			printed += ", " + products.get(product);
+		}
+		return printed;
 	}
 }

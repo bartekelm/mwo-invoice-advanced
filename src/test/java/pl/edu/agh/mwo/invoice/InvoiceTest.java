@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
 
+import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Test;
 
 import pl.edu.agh.mwo.invoice.Invoice;
@@ -99,6 +101,43 @@ public class InvoiceTest {
 		invoice.addProduct(createTaxFreeProduct(), -1);
 	}
 
+	@Test
+	public void testInvoiceNumberGreaterThanZero() {
+		Invoice invoice = createEmptyInvoice();
+		Assert.assertThat(invoice.getInvoiceNumber(), Matchers.greaterThan(0));
+	}
+	
+	@Test
+	public void testInvoiceNumberIncrementsForFurtherInvoices() {
+		Invoice invoice1 = createEmptyInvoice();
+		Invoice invoice2 = createEmptyInvoice();
+		assertEquals(invoice1.getInvoiceNumber() + 1, invoice2.getInvoiceNumber());
+	}
+	
+	@Test
+	public void testInvoiceNumberNotIncrementsForTheSameInvoice() {
+		Invoice invoice = createEmptyInvoice();
+		assertEquals(invoice.getInvoiceNumber(), invoice.getInvoiceNumber());
+	}
+	
+	@Test
+	public void testPrintedInvoiceHasNumber() {
+		Invoice invoice = createEmptyInvoice();
+		int number = invoice.getInvoiceNumber();
+		String printedInvoice = invoice.printedVersion();
+		Assert.assertThat(printedInvoice, Matchers.containsString(String.valueOf(number)));
+	}
+	
+	@Test
+	public void testPrintedInvoiceHasProduct() {
+		Invoice invoice = createEmptyInvoice();
+		invoice.addProduct(new DairyProduct("Mleko", new BigDecimal("100")));
+		invoice.addProduct(new DairyProduct("Mleko 2", new BigDecimal("100")));
+		String printedInvoice = invoice.printedVersion();
+		Assert.assertThat(printedInvoice, Matchers.containsString("Mleko"));
+		Assert.assertThat(printedInvoice, Matchers.containsString("Mleko 2"));
+	}
+	
 	private Invoice createEmptyInvoice() {
 		return new Invoice();
 	}
